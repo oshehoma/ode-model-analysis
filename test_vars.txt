@@ -1,0 +1,6 @@
+Variable symbol, Units, Value, Description
+I,Number of individuals,100.0,Infected individuals
+R,Number of individuals,150.0,Recovered individuals
+D,Number of individuals,10.0,Deceased individuals
+S,Number of individuals,367750.0,Suscetible individuals
+t,days,100.0,Time
