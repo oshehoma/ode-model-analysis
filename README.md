@@ -4,6 +4,8 @@ The purpose of this project is to generate object oriented Python code for analy
 
 Code requires three input files (variables, parameters, and model equations) and uses these files to generate mymodel.py. This is the model system file used by the ode integrator to simulate the model. 
 
+Run testing.py to run the demonstration model. 
+
 Here is how the code breaks down:
 
 class ModelEnsemble --> to be written: this class will hold experimental data, multiple instances of class Model (which are are the same model sysem but with a unique set of parameters and/or variables), methods to fit sims to data, and methods and functions to plot and print this information to files. 
