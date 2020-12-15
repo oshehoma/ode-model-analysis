@@ -14,6 +14,10 @@ class Model --> captures a single instance of a model: equations, a unique set o
   ** Begin restructuring thoughts **
   **********************************
   class Model requires two files, one containing parameter details and the other containing variable details, with values unique to this model instance. The parameter and variable lists are unique to each model system. I could state that these two files need to be ordered in such a way that class Model can assume the first variable in the file is the first variable in the set of model equations (and similarly for the parameters) but this feels like something I could easily screw up in ordering my variable and parameter files. So the only other option I see right now (which is what I have done) is to add identifying which parameter/variable goes where directly into sections of the code where it is necessary, which is multiple spots right now.....unless I can store this information someplace else in class Model as an attribute when loading the files maybe....
+  
+ One idea: I could have a third input file of model equations -- I really don't like the idea of a zillion input files but it's no different from hard coding each model system and also three isn't a zillion. 
+  
+  
   **********************************
   **  End restructuring thoughts  **
   **********************************
