@@ -31,6 +31,8 @@ class Model --> captures a single instance of a model: equations, a unique set o
 
 
 
+
+
   Currently, class Model has multiple areas within the single file that require updating for a new model system. I'm brainstorming how to best restructure    the code so that it is more user-friendly.
   
   **********************************
