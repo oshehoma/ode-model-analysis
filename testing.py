@@ -8,8 +8,14 @@ import model as m
 ### FOR TESTING
 pfile = 'test_pars.txt' # file with parameter details
 vfile = 'test_vars.txt' # file with variable details
-test = m.Model('SIRD', pfile, vfile)
-print(test)
-test.plot()
-test.par_print_to_file(pfile)
-test.var_print_to_file(vfile)
+efile = 'test_eqs.txt'	# file with model equations
+spfile = 'sim_plots'	# file name stem for simulation plots
+mfile = 'mymodel.py' # this file name is required because 
+					 #  it is imported into class model
+test = m.Model(efile)
+test.write_model(mfile)
+test.run_model()
+#print(test)
+test.plot_sims(spfile)
+#test.par_print_to_file(pfile)
+#test.var_print_to_file(vfile)

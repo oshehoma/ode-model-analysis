@@ -1,0 +1,7 @@
+#SIRD Model  
+#test_vars.txt
+#test_pars.txt
+dSdt = -beta*S*I/N  		
+dIdt = beta*S*I/N - gamma*I - mu*I 
+dRdt = gamma*I
+dDdt = mu*I

@@ -1,7 +1,7 @@
 ########################################################################
 #	Conner I Sandefur 												   #
 #	Created: 12/09/2020												   #
-#	Updated: 12/14/2020												   #			
+#	Updated: 12/15/2020												   #			
 # 	Description: Class Model contains all information about a 		   #
 #			single simulation of an ordinary differential equation 	   #
 #			model, including model equations, parameters, and 		   #
@@ -13,10 +13,13 @@ import numpy as np    				# library of array tools
 #import math							# library of math tools
 import matplotlib.pyplot as plt 	# import the plotting tools
 from scipy.integrate import odeint	# ODE integrator
-import parameters as p 				# import the Parameter tools
-import variables as v 				# import the Variable tools
+import parameter as p 				# import the Parameter tools
+import variable as v 				# import the Variable tools
+import equation as e 				# import the Equation tools
+import mymodel as m 	            # import the mymodel file 
+from datetime import datetime
 
-class Model:
+class Model(object):
 	"""Class containing all information about a model simulation:
 		Parameters (descriptions, units, and values),
 		Variables (description, units, and initial conditions),
@@ -24,79 +27,83 @@ class Model:
 
 	"""
 
-	### BEGIN FOR TESTING PURPOSES - HARD CODED MODEL INFORMATION
-	#N = 368010			# census 2019 sum across 13 counties
-	#I0 = 100		# number of active cases from first day of data set
-	#R0 = 150	# number of recovered individuals from first day of data set
-	#D0 = 10		# number of deceased individuals from 
-						#first day of data set
-	#S0 = N-I0-R0-D0		# number of susceptible based on 
-						#case data and 2019 census
-	#ic = [S0, I0, R0, D0]
-
-	
-
-
-	#beta = 1/11.0		# average rate of infection (1/days)
-	#gamma = 1/14.5		# average rate of recovery (days)
-	#mu = 1/1250			# average rate of death
-	#pars = np.array([N, beta, gamma, mu])
-
-
-	### END FOR TESTING PURPOSESS
-	
-
-	def __init__(self, name, pfile, vfile):
+	def __init__(self, efile):
 		"""Initialize this Model instance by:
-			setting up array of Parameters,
-			setting up array of Variables, and
-			simulating the model
-			model parameters are in pfile
-			variables, including time, vfile file
-
+			opening efile, which is of the following format:
+			#model name
+			#variables input file name 
+			#parameters input file name
+			equation1,
+			.....
+			equationX
+			and then, setting up the model equations, 
+				array of Parameters, and array of Variables
+			
 		"""
 	
-		self.name = name
+		# setup model name
+		f = open(efile, 'r')
+		self.name = ((f.readline()).lstrip('#')).rstrip('\n')
+		print ('Initializing: ' + self.name)
 
-		# load list of class Parameter
-		self.pars = p.load_pars(pfile)
-
-		# load list of class Variable
+		# load list of model variables
+		vfile = ((f.readline()).lstrip('#')).rstrip('\n')				
+		print ('Loading variables from ' + vfile)
 		self.vars = v.load_vars(vfile)
+		print('There are '+str(len(self.vars)-1)+' dependent variables.')
 
-		###############################################
-		### BEGIN SITUATION SPECIFIC REGION OF CODE ###
-		###    UPDATE FOR YOUR MODEL ICS and TIME 	###
-		###############################################
-		# find variables in array of Varameters using symbol
-		# SIRD MODEL
-		for var in self.vars: # for each Parameter class instance
-			if (var.get_symbol() == 'I'):
-				I0 = var.get_value()
-			elif (var.get_symbol() == 'R'):
-				R0 = var.get_value()
-			elif (var.get_symbol() == 'D'):
-				D0 = var.get_value()
-			elif (var.get_symbol() == 'S'):
-				S0 = var.get_value()
-			elif(var.get_symbol() == 't'):
-				t = var.get_value()
-		self.ic = [S0, I0, R0, D0]
+		# load list of model parameters
+		pfile = ((f.readline()).lstrip('#')).rstrip('\n')
+		print ('Loading parameters from ' + pfile)
+		self.pars = p.load_pars(pfile)
+		print ('There are '+ str(len(self.pars)) +' parameters.')
+
+		# load equations
+		print ('Loading equations from ' + efile)
+		self.eqs = e.load_eqs(efile)
+		print ('There are ' + str(len(self.eqs)) + ' equations.')
+
+
+		#for eq in self.eqs:
+		#	print(eq)
+
+		# check number variables agrees with number of equations
+		if (len(self.eqs) != len(self.vars)-1):
+			print('CAUTION: # of equations and variables off')
+
+
+		print('Setting initial conditions using ' + vfile)
+		# order equation array by the order in equation file
+		# go through each model equation and assign initial condition
+		j = 0 # index for equation array
+		self.ic = list() 
+
+		while (j < len(self.eqs)): # go through each equation
+			found = 0
+			i = 0
+			while ( (found != 1) and (i < len(self.vars))):
+				#print ('in while')
+				if (self.eqs[j].get_symbol() == self.vars[i].get_symbol()):
+					found = 1
+					self.ic.append(self.vars[i].get_value())
+				i = i + 1 # go to next variable
+			j = j + 1 # go to the next equation
 		
-		step = 1/24 # step size 
+		# find and set up time
+		i = 0
+		while (i < len(self.vars)):
+			if (self.vars[i].get_symbol() == 't'):
+					t = self.vars[i].get_value()
+			i = i + 1
+		step = 1/1000 #1/24 # step size 
 		self.time = np.arange(0, t, step) 	# time 
 	
-		###############################################
-		###  END SITUATION SPECIFIC REGION OF CODE  ###
-		###############################################
 
-		# run the model
-		print('Running the simulation.')
-		self.sim = odeint(self.model(), self.ic, self.time)
+
 
 		# calculate model components
-		print('Calculating model components.')
-		[self.comps, self.compNames, self.compUnits] = self.calculate()
+		#print('Calculating model components.')
+		#[self.comps, self.compNames, self.compUnits] = self.calculate()
 		
 
 	def __str__(self):
@@ -116,12 +123,25 @@ class Model:
 		return ''.join(dets)
 
 
+	def run_model(self):
+		"""Method to run model
+		"""
+
+		# run the model
+		print('Running the simulation.')
+		self.sim = odeint(m.model(), self.ic, self.time)
+
+
+
 	#  TO DO:
 	#	print simulation and component results to file
 	#	update plot method to generate more than one figure for
 	#		variable and/or component numbers greater than 6
 	#
 	#
+
+
+
 
 	def par_print_to_file(self, fname):
 		"""Function to print parameters to file in the same format
@@ -204,8 +224,13 @@ class Model:
 
 
 
-	def plot(self):
-		""" Plot each simulated model in its own subplot"""
+	def plot_sims(self, fname):
+		""" Plot each simulated variable in its own subplot,
+			with four subplots per figure and fname as the 
+			figure stem
+		"""
+
+		print ('Plotting simulated variables.')
 	
 		# adjust plotting parameters
 		fs = 15 #font size
@@ -225,96 +250,141 @@ class Model:
 
 		
 
-		# we only want up to six plots per figure 
-		# plot a maximum of three subplots per row:
+		# we only want up to 4 plots per figure 
 		numVars = len(self.sim[0,:])
-		print(numVars)
-		#ax_list = np.empty(numVars, dtype=object)
-		if (numVars % 6 == 0): 
-			numFigs = int(numVars / 3)
+
+		#fig_list = np.empty(numVars, dtype=object)
+		if (numVars % 4 == 0): 
+			numFigs = int(numVars / 4)
 		else:
-			numFigs = int(numVars / 3) + 1
+			numFigs = int(numVars / 4) + 1
 		#print (str(numRows))
 
-
-		fig = plt.figure(figsize=(15,15))
-		fig.suptitle('Model Variables', fontsize=fs, 
+		i = 0
+		n = 1
+		while (n <= numFigs):
+			fig = plt.figure(figsize=(15,15))
+			fig.suptitle('Model Variables Plot ' + str(n) 
+				+ ' of ' + str(numFigs), fontsize=fs, 
 				fontweight='bold', x = 0.85, color = 'navy')
-
-
-		# plot a maximum of three subplots per row:
-		#numVars = len(self.vars[:,0])
-		#print(numComps)
-		ax_list = np.empty(numVars, dtype=object)
-		if (numVars % 3 == 0): 
-			numRows = int(numVars / 3)
-		else:
-			numRows = int(numVars / 3) + 1
-		#print (str(numRows))
-
-
-
-
-
-
-		# plot first subplot: 
-		
-		for p in range(0, len(self.sim[0,:])):
-			ax_list[p] = fig.add_subplot(numRows,3,p+1, 
-				title = str(self.vars[p].get_desc()) + ' (' +
-						str(self.vars[p].get_symbol()) + ')',
-				xlabel = 'Time (' + self.vars[len(self.sim[0,:])].get_units() + ')',
-				ylabel = str(self.vars[p].get_units()),
-			)
-			ax_list[p].plot(self.time, self.sim[:,p], 
+			# plot four subplots per figure
+			ax_list = np.empty(4, dtype=object)
+			ax_index = 0
+			# plot variables 0-3, 4-7, 8-11, etc.
+			if (i+3 < len(self.sim[0,:])): # not at end of sims to plot
+				endNum = i+3
+			else:
+				endNum = len(self.sim[0,:])
+			for p in range(i, endNum+1):
+				j = 0
+				found = 0
+				# match variable details to this simulated variable
+				while (found == 0):
+					if (self.vars[j].get_symbol() == self.eqs[p].get_symbol()):
+						found = 1
+						break
+					j = j + 1
+				ax_list[ax_index] = fig.add_subplot(2,2,ax_index+1, 
+					title = str(self.vars[j].get_desc()) + ' (' +
+							str(self.vars[j].get_symbol()) + ')',
+					xlabel = 'Time (' + 
+					self.vars[len(self.sim[0,:])].get_units() + ')',
+					ylabel = str(self.vars[j].get_units())
+				)
+				ax_list[ax_index].plot(self.time, self.sim[:,p], 
 						color='black', label=str(p))
+				ax_index = ax_index+1
 
-		
-		plt.subplots_adjust(top=0.91, bottom=0.06, 
+			plt.subplots_adjust(top=0.91, bottom=0.06, 
 			left = 0.1, right = 0.97, 
 			wspace=0.3, hspace = 0.3)
 
+			#plt.show()
+
+			fig.savefig(fname + '_' + str(n) 
+						+ '_of_' + str(numFigs))
+
+			i = i + 4 # jump to next four variables
+			n = n + 1
 
 
-		plt.show()
-
-
-		fig.savefig('sim_plots.png')
-
-
-		fig = plt.figure(figsize=(15,15))
-		fig.suptitle('Model Components', fontsize=fs, 
-				fontweight='bold', x = 0.85, color = 'navy')
-
-		# plot a maximum of three subplots per row:
-		numComps = len(self.comps[:,0])
-		#print(numComps)
-		ax_list = np.empty(numComps, dtype=object)
-		if (numVars % 3 == 0): 
-			numRows = int(numComps / 3)
-		else:
-			numRows = int(numComps / 3) + 1
-		#print (str(numRows))
-
-		# plot first subplot: 
-		for p in range(0, len(self.comps[:,0])):
-			ax_list[p] = fig.add_subplot(numRows,3,p+1, 
-				title = self.compNames[p], 
-				xlabel = 'Time (' + self.vars[len(self.sim[0,:])].get_units() + ')',
-				ylabel = self.compUnits[p]
-			)
-			ax_list[p].plot(self.time, self.comps[p,:], 
-						color='black', label=str(p))
+	def plot_comps(self, fname):
+		""" Plot each component in its own subplot"""
+	
+		# adjust plotting parameters
+		fs = 15 #font size
+		lw = 4	# line width
+		parameters = {'axes.labelsize': fs, 
+			'axes.labelweight': 'bold',
+			'axes.linewidth' : lw,
+			'axes.titlesize': fs,
+			'axes.titleweight': 'bold',
+			'xtick.labelsize': 13,
+			'axes.spines.top': False,
+			'axes.spines.right': False,
+			'ytick.labelsize': fs,
+			'font.weight': 'bold'
+ 			}
+		plt.rcParams.update(parameters)
 
 		
-		plt.subplots_adjust(top=0.91, bottom=0.06, 
+		# we only want up to 4 plots per figure 
+		numVars = len(self.sim[0,:])
+
+		#fig_list = np.empty(numVars, dtype=object)
+		if (numVars % 4 == 0): 
+			numFigs = int(numVars / 4)
+		else:
+			numFigs = int(numVars / 4) + 1
+		#print (str(numRows))
+
+		i = 0
+		n = 1
+		while (n <= numFigs):
+			fig = plt.figure(figsize=(15,15))
+			fig.suptitle('Model Variables Plot ' + str(n) 
+				+ ' of ' + str(numFigs), fontsize=fs, 
+				fontweight='bold', x = 0.85, color = 'navy')
+			# plot four subplots per figure
+			ax_list = np.empty(4, dtype=object)
+			ax_index = 0
+			# plot variables 0-3, 4-7, 8-11, etc.
+			if (i+3 < len(self.sim[0,:])): # not at end of sims to plot
+				endNum = i+3
+			else:
+				endNum = len(self.sim[0,:])
+			for p in range(i, endNum+1):
+				j = 0
+				found = 0
+				# match variable details to this simulated variable
+				while (found == 0):
+					if (self.vars[j].get_symbol() == self.eqs[p].get_symbol()):
+						found = 1
+						break
+					j = j + 1
+				ax_list[ax_index] = fig.add_subplot(2,2,ax_index+1, 
+					title = str(self.vars[j].get_desc()) + ' (' +
+							str(self.vars[j].get_symbol()) + ')',
+					xlabel = 'Time (' + 
+					self.vars[len(self.sim[0,:])].get_units() + ')',
+					ylabel = str(self.vars[j].get_units())
+				)
+				ax_list[ax_index].plot(self.time, self.sim[:,p], 
+						color='black', label=str(p))
+				ax_index = ax_index+1
+
+			plt.subplots_adjust(top=0.91, bottom=0.06, 
 			left = 0.1, right = 0.97, 
 			wspace=0.3, hspace = 0.3)
 
-		plt.show()
+			plt.show()
+
+			fig.savefig(fname)
+
+			i = i + 4 # jump to next four variables
+			n = n + 1
 
 
-		fig.savefig('comp_plots.png')
 
 
 
@@ -322,104 +392,57 @@ class Model:
 
 
 
-	def model(self):
-		"""Model function used by the ODE integrator
-			Note: this function changes as parameters and 
-			model equations change
-		"""
+
+	def write_model(self,mfile):
+		"""Method to write a model function to mfile that can be used
+			by the ODE integrator. 
+		"""	
 		
-		###############################################
-		### BEGIN SITUATION SPECIFIC REGION OF CODE ###
-		###    UPDATE FOR YOUR MODEL PARAMETERS 	###
-		###############################################
-		# find parameters in array of Parameters using symbol
-		for par in self.pars: # for each Parameter class instance
-			if (par.get_symbol() == 'N'):
-				N = par.get_value()
-			elif (par.get_symbol() == 'beta'):
-				beta = par.get_value()
-			elif (par.get_symbol() == 'gamma'):
-				gamma = par.get_value()
-			elif (par.get_symbol() == 'mu'):
-				mu = par.get_value()
-		###############################################
-		###  END SITUATION SPECIFIC REGION OF CODE  ###
-		###############################################
-			
-		
-		def step(y, t):
-			"""Function to integrate the model. 
-				The model equations go here
-			"""
+		print("Writing model components to: " + mfile)
 
-			###############################################
-			### BEGIN SITUATION SPECIFIC REGION OF CODE ###
-			###    UPDATE WITH YOUR MODEL EQUATIONS 	###
-			###############################################
-			# set up model variables:
-			(S, I, R, D) = y
+		f = open(mfile, 'w') # overwrite current model file
+		f.write('# this file was written by the\n')
+		f.write('# writeModels function of class Model\n')
+		f.write('# to encode the model: ' + self.name + '\n')
+		f.write('# file written on: ')
+		f.write(datetime.now().strftime("%d-%b-%Y (%H:%M:%S.%f)")+'\n')
+		f.write('\n')
+		f.write('import numpy as np\n')
+		f.write('\n')
+		f.write('def model():\n')
+		f.write('\n')
+		f.write('\t# parameters\n')
+		for par in self.pars: # for each parameter
+			f.write('\t' + par.get_symbol() + 
+					' = ' + str(par.get_value()) + 
+					' # ' + par.get_desc() + '\n')
+		f.write('\n')
+		f.write('\tdef step(y,t):\n')
+		f.write('\t\t# set up model variables:\n')
+		f.write('\t\t(')
+		i = 0
+		while (i < len(self.eqs)-1): #  
+			f.write(self.eqs[i].get_symbol() + ', ')
+			i = i + 1
+		f.write(self.eqs[i].get_symbol() + ') = y\n')
+		f.write('\n')
+		f.write('\t\t# set up model equations:\n')
+		for eq in self.eqs:
+			f.write('\t\t' + eq.get_lhs() + ' = ' + 
+					eq.get_rhs() + '\n')
+		f.write('\n')
+		f.write('\t\tmodel = np.array([')
+		i = 0
+		while (i < len(self.eqs)-1): #  
+			f.write(self.eqs[i].get_lhs() + ', ')
+			i = i + 1
+		f.write(self.eqs[i].get_lhs() + '], dtype=float)\n')
+		f.write('\n')
+		f.write('\t\treturn model\n')
+		f.write('\n')
+		f.write('\treturn step\n')
 
-			# set up model equations:
-			dSdt = -beta*S*I/N  		
-			dIdt = beta*S*I/N - gamma*I - mu*I 
-			dRdt = gamma*I
-			dDdt = mu*I
-
-			eqs = np.array([dSdt, dIdt, dRdt, dDdt], dtype=float)
-			###############################################
-			###  END SITUATION SPECIFIC REGION OF CODE  ###
-			###############################################
-		
-
-			return eqs
-
-		return step
-
-
-
-	def calculate(self):
-		"""Calculate components of the model. These components can
-			be, for example, parts of a model equation or a ratio
-			of two model variables. 
-		"""
-
-		###############################################
-		### BEGIN SITUATION SPECIFIC REGION OF CODE ###
-		###    UPDATE FOR YOUR MODEL PARAMETERS, 	###
-		###		YOUR MODEL VARIABLES, 				###
-		###    AND WITH YOUR MODEL COMPONENTS 		###
-		###############################################
-		# find parameters in array of Parameters using symbol
-		for par in self.pars: # for each Parameter class instance
-			if (par.get_symbol() == 'N'):
-				N = par.get_value()
-			elif (par.get_symbol() == 'beta'):
-				beta = par.get_value()
-			elif (par.get_symbol() == 'gamma'):
-				gamma = par.get_value()
-			elif (par.get_symbol() == 'mu'):
-				mu = par.get_value()
-
-		# set up model variables:
-		S = self.sim[:,0]
-		I = self.sim[:,1]
-		R = self.sim[:,2]
-		D = self.sim[:,3]
-
-		comp1 = beta*S*I/N  		
-		comp2 = gamma*I
-		comp3 = mu*I
-
-		components = np.array([comp1, comp2, comp3], dtype=float)
-		componentNames = ['infection rate', 
-					'recovery rate', 'death rate']
-		componentUnits = ['# individuals/time', 
-					'# individuals/time', '# individuals/time']
-		###############################################
-		###  END SITUATION SPECIFIC REGION OF CODE  ###
-		###############################################
-
-		return [components, componentNames, componentUnits]
+		f.close()
 
 
 
