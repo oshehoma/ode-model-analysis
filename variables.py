@@ -35,17 +35,27 @@ class Variable:
 
 	
 	def get_value(self):
-		"""Function to return value of this Varameter"""
+		"""Function to return value of this Variable"""
 		return self.value
 
 
 	def get_symbol(self):
-		"""Function to return symbol for this Varameter"""
+		"""Function to return symbol for this Variable"""
 		return self.sym
+
+	
+	def get_units(self):
+		"""Function to return units for this Variable"""
+		return self.units
+
+
+	def get_desc(self):
+		"""Function to return description for this Variable"""
+		return self.desc
 
 
 	def get_info(self):
-		"""Function to return comma delimited Varameter attributes"""
+		"""Function to return comma delimited Variable attributes"""
 		return ','.join( (self.sym, self.units, 
 					str(self.value), self.desc) )
 				

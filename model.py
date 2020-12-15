@@ -1,7 +1,7 @@
 ########################################################################
 #	Conner I Sandefur 												   #
 #	Created: 12/09/2020												   #
-#	Updated: 12/09/2020												   #			
+#	Updated: 12/14/2020												   #			
 # 	Description: Class Model contains all information about a 		   #
 #			single simulation of an ordinary differential equation 	   #
 #			model, including model equations, parameters, and 		   #
@@ -46,7 +46,7 @@ class Model:
 	### END FOR TESTING PURPOSESS
 	
 
-	def __init__(self, pfile, vfile):
+	def __init__(self, name, pfile, vfile):
 		"""Initialize this Model instance by:
 			setting up array of Parameters,
 			setting up array of Variables, and
@@ -56,6 +56,8 @@ class Model:
 
 		"""
 	
+		self.name = name
+
 		# load list of class Parameter
 		self.pars = p.load_pars(pfile)
 
@@ -90,7 +92,11 @@ class Model:
 
 		# run the model
 		print('Running the simulation.')
-		self.Ymodel = odeint(self.model(), self.ic, self.time)
+		self.sim = odeint(self.model(), self.ic, self.time)
+
+		# calculate model components
+		print('Calculating model components.')
+		[self.comps, self.compNames, self.compUnits] = self.calculate()
 		
 
 	def __str__(self):
@@ -101,23 +107,19 @@ class Model:
 			Table of parameters
 		"""
 		dets =('Model Name: ' ,
-			'undefined name' '\n'
-			'Model Equations: '  '\n',
-			'undefined equations'  '\n'
-			'Model Variables: '  '\n',
-			'undefined variables'  '\n'
-			'Model Parameters: '  '\n',
-			'undefined parameters')
+			self.name, '\n'
+			'Number Model Variables: ' , 
+			str(len(self.vars)),  '\n'
+			'Number Model Parameters: ' ,
+			str(len(self.pars)) )
 
 		return ''.join(dets)
 
 
 	#  TO DO:
-	# 	update diagnostic plot to contain variable names and units
-	#	update diagnostic plot to save figure!
-	#	print simulation results to file
-	#	update print (__str__) for Model class
-	#
+	#	print simulation and component results to file
+	#	update plot method to generate more than one figure for
+	#		variable and/or component numbers greater than 6
 	#
 	#
 
@@ -163,6 +165,45 @@ class Model:
 
 
 
+	def sim_print_to_file(self, fname):
+		"""Function to print simulation results and model components
+			to comma-separated file:
+			time, variable1, variable2, ..., variableM, component1, 
+				component2, ..., componentN where
+			time is the time step,
+			variable1 is value of the first variable in the system at 
+				this time step,
+			...,
+			variableN is value of the Nth variable in the system at 
+				this time step,
+			component1 is the value of the first component in the 
+				system (e.g. -beta*S*I),
+			...,
+			componentN is the value of the Nth component in the 
+				system.
+		"""
+
+		f = open(fname, 'w') # open file f to overwrite content
+		# header line depends on variables and model components
+
+
+		
+		# time is in self.time, which is a numpy array
+		# variable is in self.sim, which is a numpy array
+		# components are in self.comps, which is a numpy array
+
+
+
+
+
+		# 
+		f.close()
+					
+	
+
+
+
+
 	def plot(self):
 		""" Plot each simulated model in its own subplot"""
 	
@@ -182,33 +223,102 @@ class Model:
  			}
 		plt.rcParams.update(parameters)
 
+		
+
+		# we only want up to six plots per figure 
+		# plot a maximum of three subplots per row:
+		numVars = len(self.sim[0,:])
+		print(numVars)
+		#ax_list = np.empty(numVars, dtype=object)
+		if (numVars % 6 == 0): 
+			numFigs = int(numVars / 3)
+		else:
+			numFigs = int(numVars / 3) + 1
+		#print (str(numRows))
+
+
 		fig = plt.figure(figsize=(15,15))
-		fig.suptitle('Model Diagnostic Plot', fontsize=fs, 
+		fig.suptitle('Model Variables', fontsize=fs, 
 				fontweight='bold', x = 0.85, color = 'navy')
 
 
 		# plot a maximum of three subplots per row:
-		numVars = len(self.Ymodel[0,:])
-		print(numVars)
+		#numVars = len(self.vars[:,0])
+		#print(numComps)
 		ax_list = np.empty(numVars, dtype=object)
 		if (numVars % 3 == 0): 
 			numRows = int(numVars / 3)
 		else:
 			numRows = int(numVars / 3) + 1
-		print (str(numRows))
+		#print (str(numRows))
+
+
+
+
+
 
 		# plot first subplot: 
 		
-		for p in range(0, len(self.Ymodel[0,:])):
+		for p in range(0, len(self.sim[0,:])):
 			ax_list[p] = fig.add_subplot(numRows,3,p+1, 
-				title = 'Variable name will here',
-				xlabel = 'Time unit will go here',
-				ylabel = 'Variable unit will go here'
+				title = str(self.vars[p].get_desc()) + ' (' +
+						str(self.vars[p].get_symbol()) + ')',
+				xlabel = 'Time (' + self.vars[len(self.sim[0,:])].get_units() + ')',
+				ylabel = str(self.vars[p].get_units()),
 			)
-			ax_list[p].plot(self.time, self.Ymodel[:,p], 
+			ax_list[p].plot(self.time, self.sim[:,p], 
 						color='black', label=str(p))
 
+		
+		plt.subplots_adjust(top=0.91, bottom=0.06, 
+			left = 0.1, right = 0.97, 
+			wspace=0.3, hspace = 0.3)
+
+
+
 		plt.show()
+
+
+		fig.savefig('sim_plots.png')
+
+
+		fig = plt.figure(figsize=(15,15))
+		fig.suptitle('Model Components', fontsize=fs, 
+				fontweight='bold', x = 0.85, color = 'navy')
+
+		# plot a maximum of three subplots per row:
+		numComps = len(self.comps[:,0])
+		#print(numComps)
+		ax_list = np.empty(numComps, dtype=object)
+		if (numVars % 3 == 0): 
+			numRows = int(numComps / 3)
+		else:
+			numRows = int(numComps / 3) + 1
+		#print (str(numRows))
+
+		# plot first subplot: 
+		for p in range(0, len(self.comps[:,0])):
+			ax_list[p] = fig.add_subplot(numRows,3,p+1, 
+				title = self.compNames[p], 
+				xlabel = 'Time (' + self.vars[len(self.sim[0,:])].get_units() + ')',
+				ylabel = self.compUnits[p]
+			)
+			ax_list[p].plot(self.time, self.comps[p,:], 
+						color='black', label=str(p))
+
+		
+		plt.subplots_adjust(top=0.91, bottom=0.06, 
+			left = 0.1, right = 0.97, 
+			wspace=0.3, hspace = 0.3)
+
+		plt.show()
+
+
+		fig.savefig('comp_plots.png')
+
+
+
+
 
 
 
@@ -267,10 +377,49 @@ class Model:
 
 
 
+	def calculate(self):
+		"""Calculate components of the model. These components can
+			be, for example, parts of a model equation or a ratio
+			of two model variables. 
+		"""
 
+		###############################################
+		### BEGIN SITUATION SPECIFIC REGION OF CODE ###
+		###    UPDATE FOR YOUR MODEL PARAMETERS, 	###
+		###		YOUR MODEL VARIABLES, 				###
+		###    AND WITH YOUR MODEL COMPONENTS 		###
+		###############################################
+		# find parameters in array of Parameters using symbol
+		for par in self.pars: # for each Parameter class instance
+			if (par.get_symbol() == 'N'):
+				N = par.get_value()
+			elif (par.get_symbol() == 'beta'):
+				beta = par.get_value()
+			elif (par.get_symbol() == 'gamma'):
+				gamma = par.get_value()
+			elif (par.get_symbol() == 'mu'):
+				mu = par.get_value()
 
+		# set up model variables:
+		S = self.sim[:,0]
+		I = self.sim[:,1]
+		R = self.sim[:,2]
+		D = self.sim[:,3]
 
+		comp1 = beta*S*I/N  		
+		comp2 = gamma*I
+		comp3 = mu*I
 
+		components = np.array([comp1, comp2, comp3], dtype=float)
+		componentNames = ['infection rate', 
+					'recovery rate', 'death rate']
+		componentUnits = ['# individuals/time', 
+					'# individuals/time', '# individuals/time']
+		###############################################
+		###  END SITUATION SPECIFIC REGION OF CODE  ###
+		###############################################
+
+		return [components, componentNames, componentUnits]
 
 
 

@@ -8,7 +8,7 @@ import model as m
 ### FOR TESTING
 pfile = 'test_pars.txt' # file with parameter details
 vfile = 'test_vars.txt' # file with variable details
-test = m.Model(pfile, vfile)
+test = m.Model('SIRD', pfile, vfile)
 print(test)
 test.plot()
 test.par_print_to_file(pfile)
