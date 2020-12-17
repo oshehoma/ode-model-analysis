@@ -1,10 +1,10 @@
 ########################################################################
 #	Conner I Sandefur 												   #
 #	Created: 12/09/2020												   #
-#	Updated: 12/14/2020												   #			
+#	Updated: 12/16/2020												   #			
 # 	Description: This file contains the Variable class      		   #
 #		and function to generate an array of class Variable format     #
-#		an input file  												   #
+#		from an input file											   #
 ########################################################################
 
 
@@ -61,7 +61,7 @@ def load_vars(file):
 		file of format:
 		v_symbol, v_units, v_value, v_description where
 		v_symbol is the symbol used for the variable by the model,
-		v_units are the units for the parameter,
+		v_units are the units for the variable,
 		v_value is the (initial) value of the variable,
 		v_description is the description of the variable, 
 		and the first line is the header line
