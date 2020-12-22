@@ -8,7 +8,7 @@ class Model uses the following classes: Parameter, Variable, Equation, and Compo
 
 Using the three input files, the code can write a Python model file for use by an ODE solver or a previously written model file can be used. Additionally, a Python file to calculate components can be written using class Model or a previously written file may be used. 
 
-Run testing.py to run the demonstration model.
+Run testing.py to run the demonstration model. 
 
 class Model --> captures a single instance of a model: equations, a unique set of parameters and initial conditions, descriptions and units of parameters and variables, simulation results, including tracking of specific components (e.g. a single term of an equation) in the model and has methods and functions to plot and print this information to files. 
   States (ie variables):
