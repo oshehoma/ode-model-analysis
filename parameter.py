@@ -1,14 +1,14 @@
 ########################################################################
 #	Conner I Sandefur 												   #
 #	Created: 12/09/2020												   #
-#	Updated: 12/09/2020												   #			
+#	Updated: 12/15/2020												   #			
 # 	Description: This file contains the Parameter class      		   #
-#		and function to generate an array of class Parameter from      #
-#		an input file 												   #
+#		and function to generate a list of class Parameter objects     #
+#		from an input file 											   #
 ########################################################################
 
 
-class Parameter:
+class Parameter(object):
 	"""Class containing information about a parameter:
 		a symbol,
 		description of parameter,
@@ -39,6 +39,11 @@ class Parameter:
 		return self.sym
 
 
+	def get_desc(self):
+		"""Function to return description for this Parameter"""
+		return self.desc
+
+
 	def get_info(self):
 		"""Function to return comma delimited Parameter attributes"""
 		return ','.join( (self.sym, self.units, 
@@ -46,7 +51,7 @@ class Parameter:
 				
 
 def load_pars(file):
-	""" Function to load array of class Parameters in comma-separated
+	""" Function to load array of class Parameter in comma-separated
 		file of format:
 		p_symbol, p_units, p_value, p_description where
 		p_symbol is the symbol used for the parameter by the model,
