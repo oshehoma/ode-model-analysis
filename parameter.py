@@ -3,8 +3,8 @@
 #	Created: 12/09/2020												   #
 #	Updated: 12/15/2020												   #			
 # 	Description: This file contains the Parameter class      		   #
-#		and function to generate an array of class Parameter from      #
-#		an input file 												   #
+#		and function to generate a list of class Parameter objects     #
+#		from an input file 											   #
 ########################################################################
 
 

@@ -1,7 +1,7 @@
 ########################################################################
 #	Conner I Sandefur 												   #
 #	Created: 12/09/2020												   #
-#	Updated: 12/17/2020												   #			
+#	Updated: 12/22/2020												   #			
 # 	Description: Class Model contains all information about a 		   #
 #			single simulation of an ordinary differential equation 	   #
 #			model, including model equations, parameters, and 		   #
@@ -10,7 +10,6 @@
 
 # import statements
 import numpy as np    				# library of array tools
-#import math							# library of math tools
 import matplotlib.pyplot as plt 	# import the plotting tools
 from scipy.integrate import odeint	# ODE integrator
 import parameter as p 				# import the Parameter tools
@@ -22,14 +21,11 @@ import mycomps as mc 				# import the mycomps file
 from datetime import datetime
 
 
-
-
 class Model(object):
 	"""Class containing all information about a model simulation:
 		Parameters (descriptions, units, and values),
 		Variables (description, units, and initial conditions),
 		model equations, and simulation results. 
-
 	"""
 
 	def __init__(self, efile, cfile = None):
@@ -74,14 +70,9 @@ class Model(object):
 			self.comps = c.load_comps(cfile)
 			print ('There are ' + str(len(self.comps)) + ' components.')
 
-
-		#for eq in self.eqs:
-		#	print(eq)
-
 		# check number variables agrees with number of equations
 		if (len(self.eqs) != len(self.vars)-1):
 			print('CAUTION: # of equations and variables off')
-
 
 		print('Setting initial conditions using ' + vfile)
 		# order equation array by the order in equation file
@@ -110,13 +101,6 @@ class Model(object):
 		self.time = np.arange(0, t, step) 	# time 
 	
 
-
-
-		# calculate model components
-		#print('Calculating model components.')
-		#[self.comps, self.compNames, self.compUnits] = self.calculate()
-		
-
 	def __str__(self):
 		"""Print general model information:
 			Name of this model
@@ -142,6 +126,7 @@ class Model(object):
 		print('Running the simulation.')
 		self.sim = odeint(m.model(), self.ic, self.time)
 
+
 	def calc_model_comps(self):
 		"""Method to call function to calculate components
 		"""
@@ -150,6 +135,7 @@ class Model(object):
 		if self.sim is not None:
 			print('Calculating the model components using simulation.')
 			self.comp_sim = mc.calc_comps(self.sim)
+
 
 	def par_print_to_file(self, fname):
 		"""Function to print parameters to file in the same format
@@ -169,7 +155,6 @@ class Model(object):
 			f.write(p.get_info())
 			f.write('\n')
 		f.close()			
-
 
 
 	def var_print_to_file(self, fname):
@@ -212,21 +197,8 @@ class Model(object):
 		"""
 
 		f = open(fname, 'w') # open file f to overwrite content
-		# header line depends on variables and model components
-		#f.write('var 1,var 2,var 3,var 4\n')
 
-
-		
-		# time is in self.time, which is a numpy array
-		# variable is in self.sim, which is a numpy array
-		# components are in self.comps, which is a numpy array
-
-
-		#self.sim.tofile(f, ',') NOT what i want
-
-		#np.savetxt(fname, (self.time),fmt='%f') #, self.sim, self.comp_sim), delimiter=',') #, fmt='%d')
-
-
+		# header line depends on the number of variables so
 		# concatenate time and variables:
 		toStack = list()
 		headerInfo = list()
@@ -242,28 +214,10 @@ class Model(object):
 
 		header = ','.join(headerInfo)
 
-		#time_vars = np.stack( (self.time, self.sim[:,0]))
-		#time_vars = np.stack( (time_vars, self.sim[:,1]))
-		#time_vars = np.stack( (time_vars, self.sim[:,2]))
-		#time_vars = np.stack( (time_vars, self.sim[:,3]))
-			
-		print(np.shape(self.time))
-		print(np.shape(self.sim))
-		print(np.shape(self.sim[:,0]))
-		print(np.shape(time_vars))
-		print(self.time)
-		print(self.sim)
-		print(time_vars)
-
 		np.savetxt(fname, np.transpose(time_vars),delimiter=',',fmt='%f', header=header)
 
-		# 
 		f.close()
 					
-	
-
-
-
 
 	def plot_sims(self, fname):
 		""" Plot each simulated variable in its own subplot,
@@ -288,8 +242,6 @@ class Model(object):
 			'font.weight': 'bold'
  			}
 		plt.rcParams.update(parameters)
-
-		
 
 		# we only want up to 4 plots per figure 
 		numVars = len(self.sim[0,:])
@@ -394,15 +346,7 @@ class Model(object):
 			else:
 				endNum = len(self.comp_sim)
 			for p in range(i, endNum): # for each subplot  is this figure
-				#j = 0
-				#found = 0
-				# match component symbol details to this simulated component
-				#while (found == 0):
-				#	if (self.comps[j].get_symbol() == self.eqs[p].get_symbol()):
-				#		found = 1
-				#		break
-				#	j = j + 1
-				print(str(p))
+				#print(str(p))
 				ax_list[ax_index] = fig.add_subplot(2,2,ax_index+1, 
 					title = str(self.comps[p].get_desc()) + ' (' +
 							str(self.comps[p].get_symbol()) + ')',
@@ -425,14 +369,6 @@ class Model(object):
 
 			i = i + 4 # jump to next four variables
 			n = n + 1
-
-
-
-
-
-
-
-
 
 
 	def write_model(self,mfile):

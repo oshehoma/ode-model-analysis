@@ -1,7 +1,7 @@
 # this file was written by the
 # write_models method of class Model
 # to encode the model: SIRD Model  
-# file written on: 17-Dec-2020 (11:55:46.120448)
+# file written on: 22-Dec-2020 (10:12:13.829576)
 
 import numpy as np
 

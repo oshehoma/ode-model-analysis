@@ -1,8 +1,10 @@
 ########################################################################
 #	Conner I Sandefur 												   #
 #	Created: 12/16/2020												   #
-#	Updated: 12/16/2020												   #			
+#	Updated: 12/22/2020												   #			
 # 	Description: This file contains the Component class      		   #
+#		and a function to generate a list of class Component objects   #
+#		from an input file											   #
 ########################################################################
 
 

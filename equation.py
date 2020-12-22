@@ -1,32 +1,26 @@
 ########################################################################
 #	Conner I Sandefur 												   #
 #	Created: 12/15/2020												   #
-#	Updated: 12/15/2020												   #			
+#	Updated: 12/22/2020												   #			
 # 	Description: This file contains the Equation class      		   #
-
-	### AND FUNCTIONS/METHODS and maybe a Component class?
+#		and a function to generate a list of class Equation objects    #
+#		from an input file											   #
 ########################################################################
 
 
 class Equation(object):
 	"""Class containing information about a differential equation:
 		a symbol
-		description of variable,
-		units, and
-		value.
+		right hand side of the equation
+		left hand side of the equation
 	"""
 	
-	#l = dIdt
-	#r = beta*S*I/N - gamma*I - mu*I   # might make this a list?
-										#  of class Components?
-	#s = I
 	
 	def __init__(self, l, r):
 		self.lhs = l
 		self.rhs = r
 		# pull out variable symbol from lhs 
 		self.sym = self.lhs.split('d')[1]
-
 
 
 	def __str__(self):
@@ -64,13 +58,6 @@ def load_eqs(file):
 
 	eqs = list()
 
-	#f = list()
-	#f.append('dSdt = -beta*S*I/N')
-	#f.append('dIdt = beta*S*I/N - gamma*I - mu*I')
-	#f.append('dRdt = gamma*I')
-	#f.append('dDdt = mu*I')
-	
-	
 	f = open(file, 'r')
 	f.readline() # skip the header lines
 	f.readline()

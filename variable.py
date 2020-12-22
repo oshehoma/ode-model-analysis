@@ -1,9 +1,9 @@
 ########################################################################
 #	Conner I Sandefur 												   #
 #	Created: 12/09/2020												   #
-#	Updated: 12/16/2020												   #			
+#	Updated: 12/22/2020												   #			
 # 	Description: This file contains the Variable class      		   #
-#		and function to generate an array of class Variable format     #
+#		and function to generate a list of class Variable objects      #
 #		from an input file											   #
 ########################################################################
 
