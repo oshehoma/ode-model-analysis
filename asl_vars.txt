@@ -1,0 +1,17 @@
+Variable symbol, Units, Value, Description
+N_Na_a,mol,0.0009,Na+ in normal ASL
+N_K_a,mol,0.00021,K+ in normal ASL
+N_Cl_a,mol,0.0008,Cl- in normal ASL
+H_a,m,0.0000076,height of normal ASL
+N_Na_c,mol,0.00089,Na+ in normal airway cell
+N_K_c,mol,0.00308,K+ in normal airway cell
+N_Cl_c,mol,0.001696,Cl- in normal airway cell
+H_c,m,0.0000293,height of airway cell
+V_a,V,-0.026,apical membrane potential
+V_b,V,-0.038,basolateral membrane potential
+ATP_a,uM,0.00179,ATP in the ASL
+ADP_a,uM,0.0387,ADP in the ASL
+AMP_a,uM,0.0702,AMP in the ASL
+ADO_a,uM,0.163,ADO in the ASL
+INO_a,uM,0.0187,INO in the ASL
+t,s,80000,Time

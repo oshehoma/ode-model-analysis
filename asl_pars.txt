@@ -1,0 +1,85 @@
+Parameter symbol, Units, Value, Description
+Iext,V,0,open circuit voltage
+gamma,NA,0.76,activity coefficient
+phi_gamma,NA,1.22368421,ratio of osmotic and activity coefficients
+F,C/mol,96485,Faraday constant
+FoverRT,C/J,37.4358835, Faraday constant (F = 96,485, C/mol) / gas constant (R = 8.314 J/mol.K) * temperature (T = 310 K)
+V_h2o,m^3/mol,1.814E-5, molar volume of water
+p_h2o_a,m/s,2.4E-4,apical membrane permeability to water
+p_h2o_b,m/s,2.4E-5,basolateral membrane permeability to water
+p_h2o_p,m/s,3.1E-5,paracellular membrane permeability to water
+C_a,0.01 F/m2,0.0323, apical membrane capacitance
+C_b,0.01 F/m2,0.334,basolateral membrane capacitance
+OSM_b,mM,279.093,basolateral osmolarity
+Na_b,mM,106.4,basolateral Na+ activity
+K_b,mM,3.952,basolateral K+ activity
+Cl_b,mM,91.2,basolateral Cl-activity
+p_ENaC,m/s,7.6073e-09,maximum permeability due to ENaC channels
+n_ENaC_ATP,NA,1,hill coefficient for ENaC inhibition by ATP
+K_ENaC_ATP,uM,0.062788,MM constant for ENaC inhibition by ATP
+n_ENaC_ADO,NA,1,hill coefficient for ENaC inhibition by ADO
+K_ENaC_ADO,uM,0.60024,MM constant for ENaC inhibition by ADO
+p_BK,m/s,5.6777e-10,maximum permeability of BK channels
+n_BK,NA,1,hill scoefficient for BK activation by ATP
+K_BK,uM,0.0004565,MM constant for BK activation by ATP
+p_CaCC,m/s,4.0715e-09,maximum permeability of CaCCs
+n_CaCC,NA,1,hill coefficient for CaCC activation by ATP
+K_CaCC,uM,5.8643e-05,MM constant for CaCC activation by ATP
+p_CFTR,m/s,1.4105e-07,maximum permeability due to CFTR channels
+n_CFTR_ATP,NA,1,hill coefficient for CFTR activation by ATP
+K_CFTR_ATP,uM,3.1967e-05,MM constant for CFTR activation by ATP
+n_CFTR,NA,1,hill coefficient for CFTR activation by ADO
+K_CFTR,uM,0.3289,MM constant for CFTR activation by ADO
+p_CaKC,m/s,5.6024e-08,maximum permeability due to basolateral K+ channels
+n_CaKC,NA,1,hill coefficient for CaKC activation by ATP
+K_CaKC,uM,0.00018571,MM constant for CaKC activation by ATP
+p_Cl_b,m/s,1.604e-09,permeability due to basolateral Cl- channels
+K_pump_Na_in,mM,0.99,Michaelis-Menten constant in mM
+K_pump_K_in,mM,9.1,Michaelis-Menten constant in mM
+K_pump_Na_ext,mM,24.3,Michaelis-Menten constant in mM
+K_pump_K_ext,mM,0.11,Michaelis-Menten constant in mM
+Jpump_max,mol/m^2.s,1.6353e-06,maximum velocity of Na+-K+-ATPase pump
+Jco_max,4e-6,1,term to allow setting cotransporter flux to zero if necessary
+K_Na_co,mM,79.8,sodium-potassium-chloride cotransporter Michaelis-Menten constant
+K_K_co,mM,0.93,sodium-potassium-chloride cotransporter Michaelis-Menten constant
+K_Cl_1_co,mM,78.3,sodium-potassium-chloride cotransporter Michaelis-Menten constant
+K_Cl_2_co,mM,18.2,sodium-potassium-chloride cotransporter Michaelis-Menten constant
+p_Na_p,m/s,1.1756e-08,shunt permeability to Na+
+p_K_p,m/s,3.0944e-10,shunt permeability to K+
+p_Cl_p,m/s,4.2155e-08,shunt permeability to Cl-
+N_IO_c,mol,0.0023755268,moles of intracellular impermeable osmolytes
+N_IO_a,mol,0.0002817776,moles of impermeable osmolytes in the ASL
+v1,nmol/(s.mL),0.105678,Vmax for NTPDAse1/highNSAP
+k1,uM,16.2517,Km for NTPDase1/highNSAP ATP hydrolysis
+v2,nmol/(s.mL),0.257737,Vmax for NTPDase3 ATP hydrolysis
+k2,uM,114.9039,Km for NTPDase3 ATP hydrolysis
+v3,nmol/(s.mL),0.333857,Vmax for lowNSAP ATP hydrolysis
+k3,uM,418.0211,Km for lowNSAP ATP hydrolysis
+v4,nmol/(s.mL),0.0084417,Vmax for NTPDase1/highNSAP ADP hydrolysis
+k4,uM,2.8496,Km for NTPDase1/highNSAP ADP hydrolysis
+v5,nmol/(s.mL),0.17869,Vmax for NTPDase3/lowNSAP ADP hydrolysis
+k5,uM,83.8649,Km for NTPDase3/lowNSAP ADP hydrolysis
+v6,nmol/(s.mL),0.02836,Vmax for Ecto 5'-NT AMP hydrolysis
+k6,uM,13.0296,Km for Ecto 5'-NT AMP hydrolysis
+v7,nmol/(s.mL),0.103053,Vmax highNSAP for AMP hydrolysis
+k7,uM,27.1738,Km for highNSAP AMP hydrolysis
+v8,nmol/(s.mL),0.19794,Vmax for lowNSAP AMP hydrolysis
+k8,uM,694.8939,Km for lowNSAP AMP hydrolysis
+v9,nmol/(s.mL),0.004925,Vmax for ADA 1 ADO hydrolysis
+k9,uM,17.0059,Km for ADA 1 ADO hydrolysis
+v10,nmol/(s.mL),0.019857,Vmax for E-NPPs ATP hydrolysis
+k10,uM,28.2971,Km for E-NPPs ATP hydrolysis
+vf,nmol/(s.mL),0.037337,Vf for Ecto-AK ADENYLATE KINASE
+kf_atp,uM,30.4114,Kf ATP for Ecto-AK ADENYLATE KINASE
+kf_amp,uM,24.6935,Kf AMP for Ecto-AK ADENYLATE KINASE
+vb,nmol/(s.mL),0.03641,Vb for Ecto-AK ADENYLATE KINASE
+kb_adp,uM,61.8122,Kb ADP for Ecto-AK ADENYLATE KINASE
+J_atp,nmol/s.ml,0.0000183,ATP release rate
+J_adp,nmol/s.ml,0.0002183,ADP release rate
+J_amp,nmol/s.ml,0.0002083,AMP release rate
+Vt1,nmol/(s.mL),0.0032683,Vmax for ADO uptake
+Kt1,uM,1.1621,Km for ADO uptake
+Vt2,nmol/(s.mL),0.0032683,Vmax for INO uptake
+Kt2,uM,1.1211,Km for INO uptake
+Ki_atp,uM,28.4167,Km for ATP inhibition on AMP --> ADO
+Ki_adp,uM,20.4125,Km for ADP inhibition on AMP --> ADO

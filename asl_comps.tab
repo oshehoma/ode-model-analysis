@@ -1,0 +1,57 @@
+Component Symbol	 Units	 Equation	 Description
+Na_a	 mM 	gamma*N_Na_a/H_a	 Na+ activity in ASL
+K_a	 mM	gamma*N_K_a/H_a	 K+ activity in ASL
+Cl_a	 mM 	gamma*N_Cl_a/H_a	 Cl- activity in ASL
+OSM_a	 NA 	(Na_a + K_a + Cl_a + N_IO_a/H_a)*phi_gamma	 osmolarity in ASL
+Na_c	 mM 	gamma*N_Na_c/H_c	 Na+ activity in cell
+K_c	 mM 	gamma*N_K_c/H_c	 K+ activity in cell
+Cl_c	 mM 	gamma*N_Cl_c/H_c	 Cl- activity in cell
+OSM_c	 NA	(Na_c + K_c + Cl_c + N_IO_c/H_c)*phi_gamma	 osmolarity in cell
+Jh2o_a	TBD	p_h2o_a * (OSM_c - OSM_a)	 water flux across apical membrane
+Jh2o_b	TBD	p_h2o_b * (OSM_c - OSM_b)	 water flux across basolateral membrane
+Jh2o_p	TBD	p_h2o_p * (OSM_a - OSM_b)	 paracellular water flux
+mua	TBD	FoverRT * V_a	 simplifying term
+exp_mua	TBD	np.exp(mua)	 simplifying term
+factor_a	TBD	mua/(exp_mua-1.0)	 simplifying term
+p_Na_a	TBD	p_ENaC/(1+(ADO_a/K_ENaC_ADO)**n_ENaC_ADO + (ATP_a/K_ENaC_ATP)**n_ENaC_ATP)	 ENaC permeability
+p_K_a	TBD	p_BK/(1+ (K_BK/ATP_a)**n_BK)	 apical BK channel permeability
+p_CFTR_a	TBD	p_CFTR/(1+(K_CFTR/ADO_a)**n_CFTR + (K_CFTR_ATP/ATP_a)**n_CFTR_ATP )	 CFTR permeability
+p_CaCC_a	TBD	p_CaCC/(1+ (K_CaCC/ATP_a)**n_CaCC)	 CaCC peremability
+p_Cl_a	TBD	p_CFTR_a + p_CaCC_a	 apical Cl- channel permeability
+J_Na_a	TBD	p_Na_a * factor_a * (Na_a - Na_c * exp_mua)	 Na+ flux across apical membrane
+J_K_a	TBD	p_K_a * factor_a * (K_a - K_c * exp_mua)	 K+ flux across apical membrane
+J_Cl_a	TBD	- p_Cl_a * factor_a * (Cl_c - Cl_a * exp_mua)	 Cl- flux across apical membrane
+mub	TBD	FoverRT * V_b	 simplifying term
+exp_mub	TBD	np.exp(mub)	 simplifying term
+factor_b	TBD	mub/(exp_mub-1.0)	 simplifying term
+p_K_b	TBD	p_CaKC/(1+ (K_CaKC/ATP_a)**n_CaKC)	 basolateral K+ permeability
+J_K_b	TBD	p_K_b * factor_b * (K_b - K_c * exp_mub)	 K+ flux across basolateral membrane
+J_Cl_b	TBD	- p_Cl_b * factor_b * (Cl_c - Cl_b * exp_mub)	 Cl- flux basolateral membrane
+V_t	TBD	V_b - V_a	 transepithelial membrane potential
+mut	TBD	FoverRT * V_t	 simplifying term
+exp_mut	TBD	np.exp(mut)	 simplifying term
+factor_t	TBD	mut/(exp_mut-1.0)	 simplifying term
+J_Na_p	TBD	p_Na_p * factor_t * (Na_b - Na_a * exp_mut)	 paracellular Na+ flux
+J_K_p	TBD	p_K_p * factor_t * (K_b - K_a * exp_mut)	 paracellular K+ flux
+J_Cl_p	TBD	- p_Cl_p * factor_t * (Cl_a - Cl_b * exp_mut)	 paracellular Cl- flux
+Jpump	TBD	Jpump_max*pow((Na_c/(Na_c+K_pump_Na_in*(1+K_c/K_pump_K_in))),3) * pow((K_b/(K_b+K_pump_K_ext*(1+Na_b/K_pump_Na_ext))),2)	 Na+-K+ pump flux
+Ia	TBD	F*(- J_Na_a - J_K_a + J_Cl_a)	 apical membrane current
+Ib	TBD	F*(Jpump - J_K_b + J_Cl_b)	 basolateral membrane current
+Ip	TBD	F*(- J_Na_p - J_K_p + J_Cl_p)	 paracellular current
+r123	TBD 	v1*ATP_a/(k1+ATP_a)+v2*ATP_a/(k2+ATP_a)+v3*ATP_a/(k3+ATP_a)	 ATP-->ADP
+r45	TBD 	v4*ADP_a/(k4+ADP_a)+v5*ADP_a/(k5+ADP_a)	 ADP-->AMP
+r678	TBD 	v6*AMP_a/(k6*(1+ATP_a/Ki_atp+ADP_a/Ki_adp)+AMP_a)+v7*AMP_a/(k7*(1+ATP_a/Ki_atp+ADP_a/Ki_adp)+AMP_a)+v8*AMP_a/(k8*(1+ATP_a/Ki_atp+ADP_a/Ki_adp)+AMP_a)	 AMP-->ADO
+r9	TBD 	v9*ADO_a/(k9+ADO_a)	ADO-->INO
+r10	 TBD	v10*ATP_a/(k10+ATP_a)	ATP-->AMP
+rAK	TBD	vf*ATP_a*AMP_a/(ATP_a*AMP_a+kf_atp*AMP_a+kf_amp*ATP_a+kf_atp*kf_amp)-vb*ADP_a*ADP_a/(ADP_a*ADP_a+kb_adp*kb_adp+2*kb_adp*ADP_a)	ATP+AMP<-->2ADP
+j_ado	TBD 	Vt1*ADO_a/(Kt1+(Kt1/Kt2)*INO_a+ADO_a)	ADO uptake
+j_ino	TBD 	Vt2*INO_a/(Kt2+(Kt2/Kt1)*ADO_a+INO_a)	INO uptake
+DFNa_a	TBD	 (V_a - (1/FoverRT/1 * np.log10(Na_a/Na_c))) * 1000	 Driving force of Na+ across apical membrane
+DFK_a	TBD	 (V_a - (1/FoverRT/1 * np.log10(K_a/K_c))) * 1000	 Driving force of K+ across apical membrane
+DFCl_a	TBD	 (V_a - (1/FoverRT/-1 * np.log10(Cl_a/Cl_c))) * 1000	 Driving force of Cl- across apical membrane
+DFNa_b	TBD	 (V_b - (1/FoverRT/1 * np.log10(Na_b/Na_c))) * 1000	 Driving force of Na+ across basolateral membrane
+DFK_b	TBD	 (V_b - (1/FoverRT/1 * np.log10(K_b/K_c))) * 1000	 Driving force of K+ across basolateral membrane
+DFCl_b	TBD	 (V_b - (1/FoverRT/-1 * np.log10(Cl_b/Cl_c))) * 1000	 Driving force of Cl- across basolateral membrane
+DFNa_p	TBD	 (V_t - (1/FoverRT/1 * np.log10(Na_b/Na_a))) * 1000	 Paracellular driving force of Na+
+DFK_p	TBD	 (V_t - (1/FoverRT/1 * np.log10(K_b/K_a))) * 1000	 Paracellular driving force of K+
+DFCl_p	TBD	 (V_t - (1/FoverRT/-1 * np.log10(Cl_a/Cl_b))) * 1000	 Paracellular driving force of Cl-
