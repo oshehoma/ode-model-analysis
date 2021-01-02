@@ -8,13 +8,13 @@ import model as m
 pfile = 'test_pars.txt' # file with parameter details
 vfile = 'test_vars.txt' # file with variable details
 efile = 'test_eqs.txt'	# file with model equations
-cfile = 'test_comps.txt' # file with model components
+cfile = 'test_comps.txt' # file with model components 
 spfile = 'sim_plots'	# file name stem for simulation plots
 cpfile = 'comp_plots'	# file name stem for component plots
 outfile = 'sim_comp_results.csv'	# file to write simulations to 
 
-#test = m.Model(efile)
-test = m.Model(efile, cfile)
+#test = m.Model(efile, 1)
+test = m.Model(efile, 1, cfile)
 #test.write_model(mfile)
 test.run_model()
 #test.write_calc_comps(ccfile)
