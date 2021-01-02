@@ -28,7 +28,7 @@ class Model(object):
 		model equations, and simulation results. 
 	"""
 
-	def __init__(self, efile, cfile = None):
+	def __init__(self, efile, step, cfile = None,):
 		"""Initialize this Model instance by:
 			opening efile, which is of the following format:
 			#model name
@@ -70,10 +70,6 @@ class Model(object):
 			self.comps = c.load_comps(cfile)
 			print ('There are ' + str(len(self.comps)) + ' components.')
 
-		# check number variables agrees with number of equations
-		if (len(self.eqs) != len(self.vars)-1):
-			print('CAUTION: # of equations and variables off')
-
 		print('Setting initial conditions using ' + vfile)
 		# order equation array by the order in equation file
 		# go through each model equation and assign initial condition
@@ -97,7 +93,7 @@ class Model(object):
 			if (self.vars[i].get_symbol() == 't'):
 					t = self.vars[i].get_value()
 			i = i + 1
-		step = 1/1000 #1/24 # step size 
+		#step = 1/1000 #1/24 # step size 
 		self.time = np.arange(0, t, step) 	# time 
 	
 
@@ -124,6 +120,8 @@ class Model(object):
 
 		# run the model
 		print('Running the simulation.')
+
+		#print(str(self.time))
 		self.sim = odeint(m.model(), self.ic, self.time)
 
 
@@ -225,7 +223,8 @@ class Model(object):
 			figure stem
 		"""
 
-		print ('Plotting simulated variables.')
+		numVars = len(self.sim[0,:])
+		print ('Plotting ' + str(numVars) + ' simulated variables.')
 	
 		# adjust plotting parameters
 		fs = 15 #font size
@@ -243,14 +242,14 @@ class Model(object):
  			}
 		plt.rcParams.update(parameters)
 
-		# we only want up to 4 plots per figure 
-		numVars = len(self.sim[0,:])
+		# we only want up to numPlots plots per figure 
+		numPlots = 4
 
 		#fig_list = np.empty(numVars, dtype=object)
-		if (numVars % 4 == 0): 
-			numFigs = int(numVars / 4)
+		if (numVars % numPlots == 0): 
+			numFigs = int(numVars / numPlots)
 		else:
-			numFigs = int(numVars / 4) + 1
+			numFigs = int(numVars / numPlots) + 1
 		#print (str(numRows))
 
 		i = 0
@@ -264,25 +263,27 @@ class Model(object):
 			ax_list = np.empty(4, dtype=object)
 			ax_index = 0
 			# plot variables 0-3, 4-7, 8-11, etc.
-			if (i+3 < len(self.sim[0,:])): # not at end of sims to plot
-				endNum = i+3
+			if (i+numPlots-1 < len(self.sim[0,:])): # not at end of sims to plot
+				endNum = i+numPlots
 			else:
 				endNum = len(self.sim[0,:])
-			for p in range(i, endNum+1):
+			#print (str(endNum))
+			for p in range(i, endNum):
 				j = 0
 				found = 0
 				# match variable details to this simulated variable
 				while (found == 0):
-					if (self.vars[j].get_symbol() == self.eqs[p].get_symbol()):
+					if (self.vars[p].get_symbol() == self.eqs[j].get_symbol()):
 						found = 1
+						#print('found ' + self.vars[p].get_symbol())
 						break
 					j = j + 1
 				ax_list[ax_index] = fig.add_subplot(2,2,ax_index+1, 
-					title = str(self.vars[j].get_desc()) + ' (' +
-							str(self.vars[j].get_symbol()) + ')',
+					title = str(self.vars[p].get_desc()) + ' (' +
+							str(self.vars[p].get_symbol()) + ')',
 					xlabel = 'Time (' + 
 					self.vars[len(self.sim[0,:])].get_units() + ')',
-					ylabel = str(self.vars[j].get_units())
+					ylabel = str(self.vars[p].get_units())
 				)
 				ax_list[ax_index].plot(self.time, self.sim[:,p], 
 						color='black', label=str(p))
@@ -297,7 +298,9 @@ class Model(object):
 			fig.savefig(fname + '_' + str(n) 
 						+ '_of_' + str(numFigs))
 
-			i = i + 4 # jump to next four variables
+			plt.close()
+
+			i = i + numPlots # jump to next four variables
 			n = n + 1
 
 
@@ -322,13 +325,15 @@ class Model(object):
  			}
 		plt.rcParams.update(parameters)
 
-		# we only want up to 4 plots per figure 
+		# we only want up to numPlots plots per figure 
 		numComps = len(self.comps)
 
-		if (numComps % 4 == 0): 
-			numFigs = int(numComps / 4)
+		numPlots = 4
+
+		if (numComps % numPlots == 0): 
+			numFigs = int(numComps / numPlots)
 		else:
-			numFigs = int(numComps / 4) + 1
+			numFigs = int(numComps / numPlots) + 1
 		
 		i = 0 # component number
 		n = 1 # figure number
@@ -341,8 +346,8 @@ class Model(object):
 			ax_list = np.empty(4, dtype=object)
 			ax_index = 0
 			# plot components 0-3, 4-7, 8-11, etc.
-			if (i+3 < len(self.comp_sim)): # not at end of components to plot
-				endNum = i+3
+			if (i+numPlots-1 < len(self.comp_sim)): # not at end of components to plot
+				endNum = i+numPlots
 			else:
 				endNum = len(self.comp_sim)
 			for p in range(i, endNum): # for each subplot  is this figure
@@ -367,7 +372,9 @@ class Model(object):
 			fig.savefig(fname + '_' + str(n) 
 						+ '_of_' + str(numFigs))
 
-			i = i + 4 # jump to next four variables
+			plt.close()
+
+			i = i + numPlots # jump to next four variables
 			n = n + 1
 
 
@@ -386,6 +393,7 @@ class Model(object):
 		f.write(datetime.now().strftime("%d-%b-%Y (%H:%M:%S.%f)")+'\n')
 		f.write('\n')
 		f.write('import numpy as np\n')
+		f.write('import math\n')
 		f.write('\n')
 		f.write('def model():\n')
 		f.write('\n')
@@ -399,10 +407,12 @@ class Model(object):
 		f.write('\t\t# set up model variables:\n')
 		f.write('\t\t(')
 		i = 0
-		while (i < len(self.eqs)-1): #  
-			f.write(self.eqs[i].get_symbol() + ', ')
+		while (i < len(self.eqs)-1):#
+			if (self.eqs[i].isDiffEq() == True):  
+				f.write(self.eqs[i].get_symbol() + ', ')
 			i = i + 1
-		f.write(self.eqs[i].get_symbol() + ') = y\n')
+		if (self.eqs[i].isDiffEq() == True):  
+			f.write(self.eqs[i].get_symbol() + ') = y\n')
 		f.write('\n')
 		f.write('\t\t# set up model equations:\n')
 		for eq in self.eqs:
@@ -412,9 +422,11 @@ class Model(object):
 		f.write('\t\tmodel = np.array([')
 		i = 0
 		while (i < len(self.eqs)-1): #  
-			f.write(self.eqs[i].get_lhs() + ', ')
+			if (self.eqs[i].isDiffEq() == True):  
+				f.write(self.eqs[i].get_lhs() + ', ')
 			i = i + 1
-		f.write(self.eqs[i].get_lhs() + '], dtype=float)\n')
+		if (self.eqs[i].isDiffEq() == True):  
+			f.write(self.eqs[i].get_lhs() + '], dtype=float)\n')
 		f.write('\n')
 		f.write('\t\treturn model\n')
 		f.write('\n')
@@ -439,6 +451,7 @@ class Model(object):
 		f.write(datetime.now().strftime("%d-%b-%Y (%H:%M:%S.%f)")+'\n')
 		f.write('\n')
 		f.write('import numpy as np\n')
+		f.write('import math\n')
 		f.write('\n')
 		f.write('def calc_comps(y):\n')
 		f.write('\n')
@@ -451,11 +464,27 @@ class Model(object):
 		f.write('\t# set up model variables:\n')
 		#f.write('\t(')
 		i = 0
-		while (i < len(self.eqs)): #  
-			f.write('\t'+self.eqs[i].get_symbol() + ' = ' +
-				'y[:,' + str(i) + ']\n')
+		j = 0
+		while (i < len(self.eqs)):#
+			if (self.eqs[i].isDiffEq() == True):  
+				f.write('\t'+self.eqs[i].get_symbol() + ' = ' +
+				'y[:,' + str(j) + ']\n')
+				j = j + 1
 			i = i + 1
+		#if (self.eqs[i].isDiffEq() == True):  
+		#	f.write(self.eqs[i].get_symbol() + ') = y\n')
 		f.write('\n')
+
+
+
+		#while (i < len(self.eqs)): #  
+		#	f.write('\t'+self.eqs[i].get_symbol() + ' = ' +
+		#		'y[:,' + str(i) + ']\n')
+		#	i = i + 1
+		#f.write('\n')
+		
+
+
 		f.write('\t# components\n')
 		f.write('\tcomps = list()\n')
 		for comp in self.comps:

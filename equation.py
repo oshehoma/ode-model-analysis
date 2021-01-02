@@ -1,7 +1,7 @@
 ########################################################################
 #	Conner I Sandefur 												   #
 #	Created: 12/15/2020												   #
-#	Updated: 12/22/2020												   #			
+#	Updated: 12/29/2020												   #			
 # 	Description: This file contains the Equation class      		   #
 #		and a function to generate a list of class Equation objects    #
 #		from an input file											   #
@@ -9,18 +9,25 @@
 
 
 class Equation(object):
-	"""Class containing information about a differential equation:
-		a symbol
+	"""Class containing information about a differential equation
+		or a term in a differential equation (for simplication)
+		a symbol 
 		right hand side of the equation
 		left hand side of the equation
+		when Equation is a term, symbol is same has left hand side
 	"""
 	
 	
 	def __init__(self, l, r):
 		self.lhs = l
 		self.rhs = r
-		# pull out variable symbol from lhs 
-		self.sym = self.lhs.split('d')[1]
+		if (l[0] == 'd'): # this is a differential equation
+			# pull out variable symbol from lhs 
+			self.sym = self.lhs.split('d')[1]
+			self.diffEq = True
+		else: # this is a term
+			self.sym = self.lhs
+			self.diffEq = False
 
 
 	def __str__(self):
@@ -43,6 +50,11 @@ class Equation(object):
 		return self.rhs
 
 
+	def isDiffEq(self):
+		"""Function to return value of diffEq"""
+		return self.diffEq
+
+
 def load_eqs(file):
 	""" Function to load array of class Equation in file of format:
 			#model name
@@ -63,6 +75,7 @@ def load_eqs(file):
 	f.readline()
 	f.readline()
 	for l in f:
+		#print(l)
 		eqs.append(Equation(l.split('=')[0].strip(), 
 			(l.split('=')[1].strip()).strip('\n')))
 						
