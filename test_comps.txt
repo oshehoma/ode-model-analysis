@@ -1,4 +1,4 @@
-Component Symbol, Units, Equation, Description
-c1, # of people/time, beta*S*I/N, rate at which people are becoming infected
-c2, # of people/time, gamma*I,  rate at which people are recovering
-c3, # of people/time, mu*I, rate at which people are dying
+Component Symbol  Units Equation  Description
+c1  # of people/time  beta*S*I/N  rate at which people are becoming infected
+c2  # of people/time  gamma*I rate at which people are recovering
+c3  # of people/time  mu*I  rate at which people are dying
