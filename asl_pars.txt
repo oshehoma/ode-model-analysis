@@ -7,7 +7,7 @@ FoverRT,C/J,37.4358835, Faraday constant (F = 96,485, C/mol) / gas constant (R =
 V_h2o,m^3/mol,1.814E-5, molar volume of water
 p_h2o_a,m/s,2.4E-4,apical membrane permeability to water
 p_h2o_b,m/s,2.4E-5,basolateral membrane permeability to water
-p_h2o_p,m/s,3.1E-5,paracellular membrane permeability to water
+p_h2o_p,m/s,8E-6,paracellular membrane permeability to water
 C_a,0.01 F/m2,0.0323, apical membrane capacitance
 C_b,0.01 F/m2,0.334,basolateral membrane capacitance
 OSM_b,mM,279.093,basolateral osmolarity
