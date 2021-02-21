@@ -38,10 +38,10 @@ class Parameter(object):
 		    old value in value_orig"""
 		self.value_orig = self.value
 		self.value = v
-
-    def reset_value(self):
-        """ Function to reset value of this Parameter back to original"""
-        self.value = self.value_orig
+		
+	def reset_value(self):
+	    """ Function to reset value of this Parameter back to original"""
+	    self.value = self.value_orig
     
 	def get_symbol(self):
 		"""Function to return symbol for this Parameter"""
@@ -51,6 +51,10 @@ class Parameter(object):
 	def get_desc(self):
 		"""Function to return description for this Parameter"""
 		return self.desc
+		
+	def get_units(self):
+		"""Function to return units for this Parameter"""
+		return self.units
 
 
 	def get_info(self):
