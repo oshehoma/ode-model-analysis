@@ -1,7 +1,7 @@
 ########################################################################
 #	Conner I Sandefur 												   #
 #	Created: 12/09/2020												   #
-#	Updated: 12/15/2020												   #			
+#	Updated: 02/21/2021												   #
 # 	Description: This file contains the Parameter class      		   #
 #		and function to generate a list of class Parameter objects     #
 #		from an input file 											   #
@@ -23,17 +23,26 @@ class Parameter(object):
 
 
 	def __str__(self):
-		#return ''.join( (self.sym, ' = ', '{:.15}'.format(self.value), 
+		#return ''.join( (self.sym, ' = ', '{:.15}'.format(self.value),
 		#	' (', self.units, ') ', 'which is the ', self.desc)  )
-		return ''.join( (self.sym, ' = ', str(self.value), 
+		return ''.join( (self.sym, ' = ', str(self.value),
 			' (', self.units, ') ', 'which is the ', self.desc)  )
 
 	
 	def get_value(self):
 		"""Function to return value of this Parameter"""
 		return self.value
+		
+	def set_value(self, v):
+		"""Function to set value of this Parameter and save
+		    old value in value_orig"""
+		self.value_orig = self.value
+		self.value = v
 
-
+    def reset_value(self):
+        """ Function to reset value of this Parameter back to original"""
+        self.value = self.value_orig
+    
 	def get_symbol(self):
 		"""Function to return symbol for this Parameter"""
 		return self.sym
@@ -46,7 +55,7 @@ class Parameter(object):
 
 	def get_info(self):
 		"""Function to return comma delimited Parameter attributes"""
-		return ','.join( (self.sym, self.units, 
+		return ','.join( (self.sym, self.units,
 					str(self.value), self.desc) )
 				
 
@@ -57,7 +66,7 @@ def load_pars(file):
 		p_symbol is the symbol used for the parameter by the model,
 		p_units are the units for the parameter,
 		p_value is the value of the parameter,
-		p_description is the description of the parameter, 
+		p_description is the description of the parameter,
 		and the first line is the header line
 	"""
 
@@ -65,7 +74,7 @@ def load_pars(file):
 	f = open(file, 'r')
 	f.readline() # skip the header line
 	for l in f:
-		pars.append(Parameter(l.split(',')[0], l.split(',')[1], 	
+		pars.append(Parameter(l.split(',')[0], l.split(',')[1],
 						float(l.split(',')[2]), l.split(',')[3].strip('\n')))
 	f.close()
 	return pars
