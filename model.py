@@ -18,7 +18,7 @@ import component as c 				# import the Component tools
 import mymodel as m 	     	    # import the mymodel file
 import mycomps as mc 				# import the mycomps file
 from datetime import datetime
-import scipy as scipy
+#import scipy as scipy
 
 from scipy.integrate import solve_ivp
 
@@ -30,7 +30,7 @@ class Model(object):
 		model equations, and simulation results.
 	"""
 
-	def __init__(self, efile, step, runToSS, cfile = None,):
+	def __init__(self, efile, step, runToSS, cfile = None, sep='\t'):
 		"""Initialize this Model instance by:
 			opening efile, which is of the following format:
 			#model name
@@ -82,7 +82,7 @@ class Model(object):
         
 		if cfile is not None:
 			print('Loading components from ' + cfile)
-			self.comps = c.load_comps(cfile)
+			self.comps = c.load_comps(cfile, sep)
 			print ('There are ' + str(len(self.comps)) + ' components.')
 
 		print('Setting initial conditions using ' + vfile)
@@ -128,17 +128,46 @@ class Model(object):
 			str(len(self.pars)) )
 
 		return ''.join(dets)
+		
+	def get_vars(self):
+	    """Return list of Variables"""
+	    return self.vars
+	
+	def get_time(self):
+		"""Return simulation time points"""
+		return self.time
+	
+	def get_eqs(self):
+		"""Return list of Equations"""
+		return self.eqs
+	
+	def get_results(self):
+		"""Return simulation results"""
+		return self.sim
 
+	def set_score(self, score):
+		"""Set score for this model compared to experimental/observational data"""
+		self.score = score
 
-	def run_model(self):
+	def run_model(self, teval, expindices = None, expics = None):
 		"""Method to run model
 		"""
+		print('Running model with ICs:')
+		print(expics)
 
+		if expics != None:
+			# use experimental/observational ics
+			j = 0
+			for i in expindices:
+				self.ic[i] = expics[j]
+				j = j + 1
+		
 		# list to change for this experiment
 		ic = list(self.ic)
 		parArray = list(self.parArray)
 		#time = list(self.time)
 		
+	
 		rtol, atol = (1e-8, 1e-8)
 
 		if (self.runToSS == True):
@@ -171,7 +200,7 @@ class Model(object):
 			
 			sys = solve_ivp(lambda t, y: m.model(t,y,self.parArray_exp), [0, t], self.ic,
 							rtol = rtol, atol = atol,
-							method='LSODA')
+							method='LSODA', t_eval=teval)
 
 			self.sim = sys.y
 			self.time = sys.t
@@ -269,16 +298,16 @@ class Model(object):
 			#print("Shape of this sim: " + str(np.shape(self.sim[:,i])))
 			toStack.append(self.sim[i,:])
 			# need to find header info associated with this diffEQ
-			j = 0
-			found = 0
+			#j = 0
+			#found = 0
 			# match variable details to this simulated variable
-			while (found == 0):
-			    if (self.vars[i].get_symbol() == self.eqs[j].get_symbol()):
-			        found = 1
-			        #print('found ' + self.vars[p].get_symbol())
-			        break
-			    j = j + 1
-			headerInfo.append(self.eqs[j].get_symbol())
+			#while (found == 0):
+			#    if (self.eqs[i].get_symbol() == self.eqs[j].get_symbol()):
+			#        found = 1
+			#        #print('found ' + self.vars[p].get_symbol())
+			#        break
+			#    j = j + 1
+			headerInfo.append(self.eqs[i].get_symbol())
 	        
 		for i in range(0, len(self.comp_sim)):
 			#print("Shape of this comp_sim: " + str(np.shape(self.comp_sim[i])))
