@@ -4,7 +4,7 @@
 #	Updated: 12/22/2020												   #
 # 	Description: This file contains the Component class      		   #
 #		and a function to generate a list of class Component objects   #
-#		from an input file											   #
+#		from a sep-delimited input file								   #
 ########################################################################
 
 
@@ -21,6 +21,7 @@ class Component(object):
 		self.eq = e
 		self.units = u
 		self.desc = d
+
 
 
 	def __str__(self):
@@ -56,22 +57,24 @@ class Component(object):
 					str(self.value), self.desc) )
 				
 
-def load_comps(file):
-	""" Function to load array of class Component in comma-separated
-		file of format:
-		c_symbol, c_units, c_equation, c_description where
+def load_comps(file, sep):
+	""" Function to load array of class Component in TAB-delimited
+		file of format: sep = separator, here, as example: tab
+		c_symbol\tc_units\tc_equation\tc_description where
 		c_symbol is the symbol used for the component by the model,
 		c_units are the units for the component,
 		c_equation is the (initial) value of the component,
 		c_description is the description of the component,
 		and the first line is the header line
 	"""
+	
 	comps = list()
 	f = open(file, 'r')
 	f.readline() # skip the header line
 	for l in f:
-		comps.append(Component(l.split(',')[0].strip(), l.split(',')[1].strip(),
-						l.split(',')[2].strip(), l.split(',')[3].strip().strip('\n')))
+		#print(l)
+		comps.append(Component(l.split(sep)[0].strip(), l.split(sep)[1].strip(),
+						l.split(sep)[2].strip(), l.split(sep)[3].strip().strip('\n')))
 	f.close()
 	return comps
 
